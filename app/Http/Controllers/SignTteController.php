@@ -267,4 +267,35 @@ class SignTteController extends Controller
             ], 500);
         }
     }
+
+    public function verifySign(Request $request)
+    {
+         $request->validate([
+            'signed_file' => 'required|mimes:pdf|max:5120', // 5120 KB = 5 MB
+        ]);
+
+        $file = $request->file('signed_file');
+
+        // Kirim ke API eksternal
+        $response = Http::attach(
+            'signed_file',
+            file_get_contents($file),   // isi file
+            $file->getClientOriginalName()
+        )->post(env('BASE_URL_BSRE') . '/sign/verify');
+
+        // Cek response
+        if ($response->successful()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'File berhasil diverifikasi',
+                'data' => $response->json()
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Verifikasi gagal',
+            'error' => $response->body()
+        ], $response->status());
+    }
 }
