@@ -7,4 +7,4 @@ Route::post('/sign/pdf', [SignTteController::class, 'signFile']);
 Route::post('/sign/resume-ralan', [SignTteController::class, 'resumeRalan']);
 
 Route::get('/sign/download/{id_dokumen}', [SignTteController::class, 'downloadFile']);
-Route::get('/sign/verify', [SignTteController::class, 'verifySign']);
+Route::post('/sign/verify', [SignTteController::class, 'verifySign']);
