@@ -270,32 +270,68 @@ class SignTteController extends Controller
 
     public function verifySign(Request $request)
     {
-         $request->validate([
-            'signed_file' => 'required|mimes:pdf|max:5120', // 5120 KB = 5 MB
-        ]);
+        try {
+            Log::info('Mulai proses verifikasi tanda tangan digital');
 
-        $file = $request->file('signed_file');
-
-        // Kirim ke API eksternal
-        $response = Http::attach(
-            'signed_file',
-            file_get_contents($file),   // isi file
-            $file->getClientOriginalName()
-        )->post(env('BASE_URL_BSRE') . '/sign/verify');
-
-        // Cek response
-        if ($response->successful()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'File berhasil diverifikasi',
-                'data' => $response->json()
+            // Validasi file PDF max 5MB
+            $request->validate([
+                'signed_file' => 'required|mimes:pdf|max:5120',
             ]);
-        }
+            Log::info('Validasi berhasil', ['filename' => $request->file('signed_file')->getClientOriginalName()]);
 
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Verifikasi gagal',
-            'error' => $response->body()
-        ], $response->status());
+            $file = $request->file('signed_file');
+
+            // Kirim ke API eksternal
+            Log::info('Mengirim file ke API verifikasi', ['api_url' => env('BASE_URL_BSRE') . '/sign/verify']);
+
+            $response = Http::attach(
+                'signed_file',
+                file_get_contents($file),
+                $file->getClientOriginalName()
+            )->post(env('BASE_URL_BSRE') . '/sign/verify');
+
+            Log::info('Response diterima dari API', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+
+            // Cek response
+            if ($response->successful()) {
+                Log::info('Verifikasi berhasil');
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'File berhasil diverifikasi',
+                    'data' => $response->json(),
+                ]);
+            }
+
+            Log::warning('Verifikasi gagal', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Verifikasi gagal',
+                'error' => $response->body()
+            ], $response->status());
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validasi gagal', ['errors' => $e->errors()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi input gagal',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Terjadi kesalahan saat verifikasi', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan internal',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
