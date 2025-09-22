@@ -210,6 +210,121 @@ class SignTteController extends Controller
         }
     }
 
+    public function resumeRanap(Request $request)
+    {
+        $resume     = $request->input('resume');
+        $nik        = $request->input('nik');
+        $passphrase = $request->input('passphrase');
+
+        $mask = function (?string $val, $start = 2, $end = 2) {
+            if (!$val) return null;
+            $len = mb_strlen($val);
+            if ($len <= ($start + $end)) return str_repeat('*', $len);
+            return mb_substr($val, 0, $start) . str_repeat('*', $len - ($start + $end)) . mb_substr($val, -$end);
+        };
+
+        Log::info('resumeRanap invoked', [
+            'no_rawat' => data_get($resume, 'no_rawat'),
+            'nik_mask' => $mask($nik),
+            'request_ip' => $request->ip(),
+        ]);
+
+        // validasi sederhana
+        if (!$resume) {
+            Log::warning('Resume kosong / tidak ditemukan', ['input_present' => $request->has('resume')]);
+            return response()->json(['error' => 'Data resume tidak ditemukan'], 400);
+        }
+        if (!$nik || !$passphrase) {
+            Log::warning('Credential untuk signing tidak lengkap', [
+                'nik_present' => (bool) $nik,
+                'passphrase_present' => (bool) $passphrase,
+            ]);
+            return response()->json(['error' => 'Nik atau passphrase tidak boleh kosong'], 400);
+        }
+
+        // generate PDF
+        try {
+            Log::info('Mulai generate PDF', ['view' => 'resume-ranap', 'no_rawat' => data_get($resume, 'no_rawat')]);
+
+            $pdf = Pdf::loadView('resume-ranap', compact('resume'))->setPaper('A4');
+            $pdfContent = $pdf->output();
+
+            Log::info('PDF berhasil digenerate', [
+                'bytes' => strlen($pdfContent),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Gagal generate PDF', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'error' => 'Gagal generate PDF',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        // siapkan filename
+        $filename = 'resume_ranap_' . Carbon::now()->timestamp . '.pdf';
+
+        // kirim ke API signing tanpa menyimpan di server
+        $apiUrl = rtrim(env('BASE_URL_BSRE', ''), '/') . '/sign/pdf';
+        Log::info('Mulai request ke signing API', [
+            'endpoint' => $apiUrl,
+            'username_env_set' => !empty(env('USERNAME_BSRE')),
+            'no_rawat' => data_get($resume, 'no_rawat'),
+        ]);
+
+        try {
+            $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
+                ->timeout(60)
+                ->attach('file', $pdfContent, $filename)
+                ->post($apiUrl, [
+                    'nik' => $nik,
+                    'passphrase' => $passphrase,
+                    'tampilan' => 'invisible',
+                ]);
+
+            // log status dan beberapa header penting (tanpa mengeluarkan header sensitif)
+            Log::info('Response dari signing API diterima', [
+                'status' => $response->status(),
+                'content_type' => $response->header('Content-Type'),
+                'content_length' => $response->header('Content-Length'),
+            ]);
+
+            // sukses
+            if ($response->successful()) {
+                return response()->json([
+                    'message' => 'Resume berhasil DI SIGN',
+                    'api_response' => $response->headers(),
+                ], 200);
+            }
+
+            // jika HTTP error (4xx/5xx) dari API
+            $respBody = $response->body();
+            Log::error('Signing API mengembalikan error', [
+                'status' => $response->status(),
+                'body_preview' => is_string($respBody) ? substr($respBody, 0, 2000) : $respBody,
+            ]);
+
+            return response()->json([
+                'error' => 'Signing API error',
+                'status' => $response->status(),
+                'body' => $respBody,
+            ], $response->status() ?: 500);
+        } catch (\Throwable $e) {
+            // error koneksi / timeout / exception lain
+            Log::error('Koneksi ke signing API gagal', [
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'error' => 'Koneksi ke signing API gagal',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function downloadFile($id)
     {
         $tempFilePath = storage_path('app/private/temp_' . $id . '.pdf');
