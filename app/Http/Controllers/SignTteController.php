@@ -408,32 +408,19 @@ class SignTteController extends Controller
             Log::info('Response diterima dari API', [
                 'status' => $response->status(),
                 'headers' => $response->headers(),
-                'body' => substr($response->body(), 0, 500) // potong biar gak kebanyakan di log
+                'body' => $response->body()
             ]);
-
-            $contentType = $response->header('Content-Type');
 
             // Cek response
             if ($response->successful()) {
-                if (str_contains($contentType, 'application/json')) {
-                    $data = $response->json();
-                    Log::info('Verifikasi berhasil dengan JSON', $data);
+                $data = $response->json();
+                Log::info('Verifikasi berhasil dengan JSON', $data);
 
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'File berhasil diverifikasi',
-                        'data' => $data,
-                    ]);
-                } else {
-                    $html = $response->body();
-                    Log::warning('API mengembalikan HTML, bukan JSON', ['html_snippet' => substr($html, 0, 200)]);
-
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'API tidak mengembalikan JSON, dapat HTML',
-                        'html' => $html,
-                    ], 500);
-                }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'File berhasil diverifikasi',
+                    'data' => $data,
+                ]);
             }
 
             Log::warning('Verifikasi gagal', [
