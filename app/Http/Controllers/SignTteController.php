@@ -399,11 +399,12 @@ class SignTteController extends Controller
             // Kirim ke API eksternal
             Log::info('Mengirim file ke API verifikasi', ['api_url' => env('BASE_URL_BSRE') . '/sign/verify']);
 
-            $response = Http::attach(
-                'signed_file',
-                file_get_contents($file),
-                $file->getClientOriginalName()
-            )->post(env('BASE_URL_BSRE') . '/sign/verify');
+            $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
+                ->attach(
+                    'signed_file',
+                    file_get_contents($file),
+                    $file->getClientOriginalName()
+                )->post(env('BASE_URL_BSRE') . '/sign/verify');
 
             Log::info('Response diterima dari API', [
                 'status' => $response->status(),
@@ -413,7 +414,7 @@ class SignTteController extends Controller
 
             // Cek response
             if ($response->successful()) {
-                $data = $response->json();
+                $data = $response->body();
                 Log::info('Verifikasi berhasil dengan JSON', $data);
 
                 return response()->json([
