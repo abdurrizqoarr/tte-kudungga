@@ -415,7 +415,7 @@ class SignTteController extends Controller
             // Cek response
             if ($response->successful()) {
                 $data = $response->body();
-                Log::info('Verifikasi berhasil dengan JSON', $data);
+                Log::info('Verifikasi berhasil dengan JSON', [$data]);
 
                 return response()->json([
                     'status' => 'success',
