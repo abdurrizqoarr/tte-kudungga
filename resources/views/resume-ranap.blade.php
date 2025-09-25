@@ -226,7 +226,7 @@
         <div class="ttd" style="text-align: center; margin-top: 60px;">
             <p>Sangatta, {{ $tanggalSekarang }}</p>
             <img src="{{ public_path('logo/qrcode.png') }}" alt="qr"
-                style="width: 100px; height: 100px; object-fit: contain;">
+                style="width: 120px; height: 120px; object-fit: contain; margin-top: 3px; margin-bottom: 3px;">
             <p><strong>{{ $resume['dokter_dpjb'] }}</strong></p>
         </div>
 
