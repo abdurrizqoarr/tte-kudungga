@@ -270,13 +270,12 @@ class SignTteController extends Controller
         $apiUrl = rtrim(env('BASE_URL_BSRE', ''), '/') . '/sign/pdf';
         Log::info('Mulai request ke signing API', [
             'endpoint' => $apiUrl,
-            'username_env_set' => !empty(env('USERNAME_BSRE')),
             'no_rawat' => data_get($resume, 'no_rawat'),
         ]);
 
         try {
             $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
-                ->timeout(60)
+                ->timeout(180)
                 ->attach('file', $pdfContent, $filename)
                 ->post($apiUrl, [
                     'nik' => $nik,
@@ -287,6 +286,7 @@ class SignTteController extends Controller
             // log status dan beberapa header penting (tanpa mengeluarkan header sensitif)
             Log::info('Response dari signing API diterima', [
                 'status' => $response->status(),
+                'header' => $response->headers(),
                 'content_type' => $response->header('Content-Type'),
                 'content_length' => $response->header('Content-Length'),
             ]);
