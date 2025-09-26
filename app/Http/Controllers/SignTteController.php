@@ -67,6 +67,7 @@ class SignTteController extends Controller
                 'yAxis'      => $request->input('yAxis'),
                 'width'      => $request->input('width', 80),
                 'height'     => $request->input('height', 80),
+                'tag_koordinat' => "^"
             ];
 
             Log::info("Mengirim request sign dokumen dengan QR", [
