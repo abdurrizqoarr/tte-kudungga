@@ -55,11 +55,9 @@ class SignTteController extends Controller
 
             // Baca file PDF
             $file = $request->file('signed_file');
-            $fileContent = base64_encode(file_get_contents($file->getRealPath()));
 
             // Payload untuk server utama
             $payload = [
-                'file'       => $fileContent,
                 'nik'        => $request->input('nik'),
                 'passphrase' => $request->input('passphrase'),
                 'tampilan'   => $request->input('tampilan', 'visible'),
@@ -80,7 +78,11 @@ class SignTteController extends Controller
 
             // Panggil API eksternal
             $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
-                ->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
+                ->attach(
+                    'signed_file',                 // nama field file sesuai yang diminta API
+                    file_get_contents($file->getRealPath()),
+                    $file->getClientOriginalName()
+                )->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
 
             if ($response->successful()) {
                 Log::info("Dokumen berhasil ditandatangani dengan QR", [
