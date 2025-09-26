@@ -60,7 +60,7 @@ class SignTteController extends Controller
             $payload = [
                 'nik'        => $request->input('nik'),
                 'passphrase' => $request->input('passphrase'),
-                'tampilan'   => $request->input('tampilan', 'visible'),
+                'tampilan'   => "visible",
                 'linkQR'     => "http://tte.kutaitimurkab.go.id",
                 'page'       => $request->input('page'),
                 'xAxis'      => $request->input('xAxis'),
@@ -71,10 +71,7 @@ class SignTteController extends Controller
             ];
 
             Log::info("Mengirim request sign dokumen dengan QR", [
-                'nik'    => $payload['nik'],
-                'page'   => $payload['page'],
-                'xAxis'  => $payload['xAxis'],
-                'yAxis'  => $payload['yAxis']
+                'data'    => $payload,
             ]);
 
             // Panggil API eksternal

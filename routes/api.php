@@ -3,8 +3,6 @@
 use App\Http\Controllers\SignTteController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/sign/pdf', [SignTteController::class, 'signFile']);
-
 Route::post('/sign/resume-ralan', [SignTteController::class, 'resumeRalan']);
 Route::post('/sign/resume-ranap', [SignTteController::class, 'resumeRanap']);
 Route::post('/sign/dokumen-with-qr', [SignTteController::class, 'signDokumenWithQr']);
