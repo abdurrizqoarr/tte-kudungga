@@ -12,84 +12,109 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class SignTteController extends Controller
 {
-    public function signFile(Request $request)
+    public function signDokumenWithQr(Request $request)
     {
-        $body = $request->except(['file', 'imageTTD']); // ambil semua kecuali file
-        $filePaths = [];
-
         try {
-            Log::info('SignFile Request Initiated', [
-                'url'  => env('BASE_URL_BSRE') . '/sign/pdf',
-                'body' => $body,
+            // Validasi request dengan custom message
+            $validator = Validator::make($request->all(), [
+                'signed_file' => 'required|file|mimes:pdf|max:5120',
+                'passphrase'  => 'required|string',
+                'nik'         => 'required|string',
+                'page'        => 'required|integer|min:1',
+                'xAxis'       => 'required|numeric|min:0',
+                'yAxis'       => 'required|numeric|min:0',
+                'width'       => 'nullable|numeric|min:1',
+                'height'      => 'nullable|numeric|min:1',
+            ], [
+                'signed_file.required' => 'File PDF wajib diunggah.',
+                'signed_file.mimes'    => 'File harus berformat PDF.',
+                'signed_file.max'      => 'Ukuran file maksimal 5MB.',
+                'passphrase.required'  => 'Passphrase wajib diisi.',
+                'nik.required'         => 'NIK wajib diisi.',
+                'page.required'        => 'Nomor halaman wajib diisi.',
+                'page.integer'         => 'Nomor halaman harus berupa angka.',
+                'xAxis.required'       => 'Posisi X wajib diisi.',
+                'yAxis.required'       => 'Posisi Y wajib diisi.',
             ]);
 
-            // Simpan file yang diupload ke storage/app/private
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                $randomName = Str::random(20) . '.' . $file->getClientOriginalExtension();
-                $filePath = $file->storeAs('private', $randomName, 'local'); // storage/app/private
-                $filePaths['file'] = storage_path('app/private/' . $filePath);
+            if ($validator->fails()) {
+                Log::warning("Validasi gagal saat sign dokumen dengan QR", [
+                    'errors' => $validator->errors()->toArray()
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors'  => $validator->errors()
+                ], 422);
             }
 
-            if ($request->hasFile('imageTTD')) {
-                $imageTTD = $request->file('imageTTD');
-                $randomName = Str::random(20) . '.' . $imageTTD->getClientOriginalExtension();
-                $imagePath = $imageTTD->storeAs('private', $randomName, 'local'); // storage/app/private
-                $filePaths['imageTTD'] = storage_path('app/private/' . $imagePath);
-            }
+            // Baca file PDF
+            $file = $request->file('signed_file');
+            $fileContent = base64_encode(file_get_contents($file->getRealPath()));
 
-            // Buat request HTTP dengan attach file
-            $http = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'));
+            // Payload untuk server utama
+            $payload = [
+                'file'       => $fileContent,
+                'nik'        => $request->input('nik'),
+                'passphrase' => $request->input('passphrase'),
+                'tampilan'   => $request->input('tampilan', 'visible'),
+                'linkQR'     => "http://tte.kutaitimurkab.go.id",
+                'page'       => $request->input('page'),
+                'xAxis'      => $request->input('xAxis'),
+                'yAxis'      => $request->input('yAxis'),
+                'width'      => $request->input('width', 80),
+                'height'     => $request->input('height', 80),
+            ];
 
-            if (isset($filePaths['file'])) {
-                $http->attach('file', file_get_contents($filePaths['file']), $request->file('file')->getClientOriginalName());
-            }
-
-            if (isset($filePaths['imageTTD'])) {
-                $http->attach('imageTTD', file_get_contents($filePaths['imageTTD']), $request->file('imageTTD')->getClientOriginalName());
-            }
-
-            $response = $http->post(env('BASE_URL_BSRE') . '/sign/pdf', $body);
-            $response->throw();
-
-            Log::info('SignFile Response Received', [
-                'status'   => $response->status(),
-                'body'     => $response->json(),
-                'headers'  => $response->headers(),
+            Log::info("Mengirim request sign dokumen dengan QR", [
+                'nik'    => $payload['nik'],
+                'page'   => $payload['page'],
+                'xAxis'  => $payload['xAxis'],
+                'yAxis'  => $payload['yAxis']
             ]);
 
-            $signDokumen = SignDokumen::create([
-                'nik' => $request->input('nik'),
-                'dokumen_asli' => $filePaths['file'] ? basename($filePaths['file']) : null,
-                'id_dokumen_ttd' => $response->headers()['id_dokumen'][0] ?? null,
-                'image_ttd' => "uji coba"
+            // Panggil API eksternal
+            $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
+                ->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
+
+            if ($response->successful()) {
+                Log::info("Dokumen berhasil ditandatangani dengan QR", [
+                    'nik' => $payload['nik']
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Dokumen berhasil ditandatangani dengan QR',
+                    'data'    => $response->headers()
+                ]);
+            }
+
+            Log::error("Gagal menandatangani dokumen dengan QR", [
+                'status'  => $response->status(),
+                'error'   => $response->json()
             ]);
 
             return response()->json([
-                'message' => 'Berhasil',
-                'data' => $signDokumen
-            ], 200);
-        } catch (RequestException $e) {
-            Log::error('SignFile API Error', [
-                'status' => $e->response?->status(),
-                'body'   => $e->response?->body(),
-                'headers' => $e->response?->headers(),
-                'trace'  => $e->getTraceAsString(),
+                'success' => false,
+                'message' => 'Gagal menandatangani dokumen dengan QR',
+                'error'   => $response->json()
+            ], $response->status());
+        } catch (\Exception $e) {
+            Log::error("Exception saat sign dokumen dengan QR", [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString()
             ]);
 
             return response()->json([
-                'error' => 'Terjadi kesalahan saat melakukan request',
-                'detail' => $e->response?->body(),
-            ], $e->response?->status() ?? 500);
-        } finally {
-            foreach ($filePaths as $path) {
-                if (file_exists($path)) {
-                    unlink($path);
-                }
-            }
+                'success' => false,
+                'message' => 'Terjadi kesalahan internal pada server.',
+                'error'   => $e->getMessage()
+            ], 500);
         }
     }
 
