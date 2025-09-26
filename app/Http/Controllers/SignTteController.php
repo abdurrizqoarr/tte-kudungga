@@ -77,7 +77,7 @@ class SignTteController extends Controller
             // Panggil API eksternal
             $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
                 ->attach(
-                    'signed_file',                 // nama field file sesuai yang diminta API
+                    'file',                 // nama field file sesuai yang diminta API
                     file_get_contents($file->getRealPath()),
                     $file->getClientOriginalName()
                 )->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
