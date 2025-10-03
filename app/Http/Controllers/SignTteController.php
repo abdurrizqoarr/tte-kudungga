@@ -63,8 +63,8 @@ class SignTteController extends Controller
                 'tampilan'   => "visible",
                 'linkQR'     => "http://tte.kutaitimurkab.go.id",
                 'page'       => $request->input('page'),
-                'xAxis'      => 30,
-                'yAxis'      => 30,
+                'xAxis'      => 200,
+                'yAxis'      => 100,
                 'width'      => $request->input('width', 80),
                 'height'     => $request->input('height', 80),
             ];
