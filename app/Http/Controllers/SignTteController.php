@@ -64,7 +64,7 @@ class SignTteController extends Controller
                 'linkQR'     => "http://tte.kutaitimurkab.go.id",
                 'page'       => $request->input('page'),
                 'xAxis'      => $request->input('xAxis'),
-                'yAxis'      => $request->input('yAxis') - 200,
+                'yAxis'      => $request->input('yAxis'),
                 'width'      => 90,
                 'height'     => 90,
             ];
