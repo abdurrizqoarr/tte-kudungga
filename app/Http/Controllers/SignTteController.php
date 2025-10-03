@@ -64,9 +64,9 @@ class SignTteController extends Controller
                 'linkQR'     => "http://tte.kutaitimurkab.go.id",
                 'page'       => $request->input('page'),
                 'xAxis'      => $request->input('xAxis'),
-                'yAxis'      => $request->input('yAxis'),
-                'width'      => 100,
-                'height'     => 100,
+                'yAxis'      => $request->input('yAxis') - 200,
+                'width'      => 90,
+                'height'     => 90,
             ];
 
             Log::info("Mengirim request sign dokumen dengan QR", [
