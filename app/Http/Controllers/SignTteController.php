@@ -27,8 +27,6 @@ class SignTteController extends Controller
                 'page'        => 'required|integer|min:1',
                 'xAxis'       => 'required|numeric|min:0',
                 'yAxis'       => 'required|numeric|min:0',
-                'width'       => 'nullable|numeric|min:1',
-                'height'      => 'nullable|numeric|min:1',
             ], [
                 'signed_file.required' => 'File PDF wajib diunggah.',
                 'signed_file.mimes'    => 'File harus berformat PDF.',
