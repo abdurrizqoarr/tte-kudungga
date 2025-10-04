@@ -130,7 +130,7 @@ class SignTteController extends Controller
             return mb_substr($val, 0, $start) . str_repeat('*', $len - ($start + $end)) . mb_substr($val, -$end);
         };
 
-        Log::info('resumeRalan invoked', [
+        Log::channel('signature_resume_ralan')->info('resumeRalan invoked', [
             'no_rawat' => data_get($resume, 'no_rawat'),
             'nik_mask' => $mask($nik),
             'request_ip' => $request->ip(),
@@ -138,11 +138,11 @@ class SignTteController extends Controller
 
         // validasi sederhana
         if (!$resume) {
-            Log::warning('Resume kosong / tidak ditemukan', ['input_present' => $request->has('resume')]);
+            Log::channel('signature_resume_ralan')->warning('Resume kosong / tidak ditemukan', ['input_present' => $request->has('resume')]);
             return response()->json(['error' => 'Data resume tidak ditemukan'], 400);
         }
         if (!$nik || !$passphrase) {
-            Log::warning('Credential untuk signing tidak lengkap', [
+            Log::channel('signature_resume_ralan')->warning('Credential untuk signing tidak lengkap', [
                 'nik_present' => (bool) $nik,
                 'passphrase_present' => (bool) $passphrase,
             ]);
@@ -151,16 +151,16 @@ class SignTteController extends Controller
 
         // generate PDF
         try {
-            Log::info('Mulai generate PDF', ['view' => 'resume-ralan', 'no_rawat' => data_get($resume, 'no_rawat')]);
+            Log::channel('signature_resume_ralan')->info('Mulai generate PDF', ['view' => 'resume-ralan', 'no_rawat' => data_get($resume, 'no_rawat')]);
 
             $pdf = Pdf::loadView('resume-ralan', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
-            Log::info('PDF berhasil digenerate', [
+            Log::channel('signature_resume_ralan')->info('PDF berhasil digenerate', [
                 'bytes' => strlen($pdfContent),
             ]);
         } catch (\Throwable $e) {
-            Log::error('Gagal generate PDF', [
+            Log::channel('signature_resume_ralan')->error('Gagal generate PDF', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -175,7 +175,7 @@ class SignTteController extends Controller
 
         // kirim ke API signing tanpa menyimpan di server
         $apiUrl = rtrim(env('BASE_URL_BSRE', ''), '/') . '/sign/pdf';
-        Log::info('Mulai request ke signing API', [
+        Log::channel('signature_resume_ralan')->info('Mulai request ke signing API', [
             'endpoint' => $apiUrl,
             'username_env_set' => !empty(env('USERNAME_BSRE')),
             'no_rawat' => data_get($resume, 'no_rawat'),
@@ -192,7 +192,7 @@ class SignTteController extends Controller
                 ]);
 
             // log status dan beberapa header penting (tanpa mengeluarkan header sensitif)
-            Log::info('Response dari signing API diterima', [
+            Log::channel('signature_resume_ralan')->info('Response dari signing API diterima', [
                 'status' => $response->status(),
                 'content_type' => $response->header('Content-Type'),
                 'content_length' => $response->header('Content-Length'),
@@ -208,7 +208,7 @@ class SignTteController extends Controller
 
             // jika HTTP error (4xx/5xx) dari API
             $respBody = $response->body();
-            Log::error('Signing API mengembalikan error', [
+            Log::channel('signature_resume_ralan')->error('Signing API mengembalikan error', [
                 'status' => $response->status(),
                 'body_preview' => is_string($respBody) ? substr($respBody, 0, 2000) : $respBody,
             ]);
@@ -220,7 +220,7 @@ class SignTteController extends Controller
             ], $response->status() ?: 500);
         } catch (\Throwable $e) {
             // error koneksi / timeout / exception lain
-            Log::error('Koneksi ke signing API gagal', [
+            Log::channel('signature_resume_ralan')->error('Koneksi ke signing API gagal', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -245,7 +245,7 @@ class SignTteController extends Controller
             return mb_substr($val, 0, $start) . str_repeat('*', $len - ($start + $end)) . mb_substr($val, -$end);
         };
 
-        Log::info('resumeRanap invoked', [
+        Log::channel('signature_resume_ranap')->info('resumeRanap invoked', [
             'no_rawat' => data_get($resume, 'no_rawat'),
             'nik_mask' => $mask($nik),
             'request_ip' => $request->ip(),
@@ -253,11 +253,11 @@ class SignTteController extends Controller
 
         // validasi sederhana
         if (!$resume) {
-            Log::warning('Resume kosong / tidak ditemukan', ['input_present' => $request->has('resume')]);
+            Log::channel('signature_resume_ranap')->warning('Resume kosong / tidak ditemukan', ['input_present' => $request->has('resume')]);
             return response()->json(['error' => 'Data resume tidak ditemukan'], 400);
         }
         if (!$nik || !$passphrase) {
-            Log::warning('Credential untuk signing tidak lengkap', [
+            Log::channel('signature_resume_ranap')->warning('Credential untuk signing tidak lengkap', [
                 'nik_present' => (bool) $nik,
                 'passphrase_present' => (bool) $passphrase,
             ]);
@@ -266,16 +266,16 @@ class SignTteController extends Controller
 
         // generate PDF
         try {
-            Log::info('Mulai generate PDF', ['view' => 'resume-ranap', 'no_rawat' => data_get($resume, 'no_rawat')]);
+            Log::channel('signature_resume_ranap')->info('Mulai generate PDF', ['view' => 'resume-ranap', 'no_rawat' => data_get($resume, 'no_rawat')]);
 
             $pdf = Pdf::loadView('resume-ranap', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
-            Log::info('PDF berhasil digenerate', [
+            Log::channel('signature_resume_ranap')->info('PDF berhasil digenerate', [
                 'bytes' => strlen($pdfContent),
             ]);
         } catch (\Throwable $e) {
-            Log::error('Gagal generate PDF', [
+            Log::channel('signature_resume_ranap')->error('Gagal generate PDF', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -290,7 +290,7 @@ class SignTteController extends Controller
 
         // kirim ke API signing tanpa menyimpan di server
         $apiUrl = rtrim(env('BASE_URL_BSRE', ''), '/') . '/sign/pdf';
-        Log::info('Mulai request ke signing API', [
+        Log::channel('signature_resume_ranap')->info('Mulai request ke signing API', [
             'endpoint' => $apiUrl,
             'no_rawat' => data_get($resume, 'no_rawat'),
         ]);
@@ -306,7 +306,7 @@ class SignTteController extends Controller
                 ]);
 
             // log status dan beberapa header penting (tanpa mengeluarkan header sensitif)
-            Log::info('Response dari signing API diterima', [
+            Log::channel('signature_resume_ranap')->info('Response dari signing API diterima', [
                 'status' => $response->status(),
                 'header' => $response->headers(),
                 'content_type' => $response->header('Content-Type'),
@@ -323,7 +323,7 @@ class SignTteController extends Controller
 
             // jika HTTP error (4xx/5xx) dari API
             $respBody = $response->body();
-            Log::error('Signing API mengembalikan error', [
+            Log::channel('signature_resume_ranap')->error('Signing API mengembalikan error', [
                 'status' => $response->status(),
                 'body_preview' => is_string($respBody) ? substr($respBody, 0, 2000) : $respBody,
             ]);
@@ -335,7 +335,7 @@ class SignTteController extends Controller
             ], $response->status() ?: 500);
         } catch (\Throwable $e) {
             // error koneksi / timeout / exception lain
-            Log::error('Koneksi ke signing API gagal', [
+            Log::channel('signature_resume_ranap')->error('Koneksi ke signing API gagal', [
                 'exception' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -343,6 +343,92 @@ class SignTteController extends Controller
             return response()->json([
                 'error' => 'Koneksi ke signing API gagal',
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function signDokumenNoQr(Request $request)
+    {
+        try {
+            // Validasi request dengan custom message
+            $validator = Validator::make($request->all(), [
+                'signed_file' => 'required|file|mimes:pdf|max:5120',
+                'passphrase'  => 'required|string',
+                'nik'         => 'required|string',
+            ], [
+                'signed_file.required' => 'File PDF wajib diunggah.',
+                'signed_file.mimes'    => 'File harus berformat PDF.',
+                'signed_file.max'      => 'Ukuran file maksimal 5MB.',
+                'passphrase.required'  => 'Passphrase wajib diisi.',
+                'nik.required'         => 'NIK wajib diisi.',
+            ]);
+
+            if ($validator->fails()) {
+                Log::channel('signature_no_qr')->warning("Validasi gagal saat sign dokumen dengan QR", [
+                    'errors' => $validator->errors()->toArray()
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors'  => $validator->errors()
+                ], 422);
+            }
+
+            // Baca file PDF
+            $file = $request->file('signed_file');
+
+            // Payload untuk server utama
+            $payload = [
+                'nik'        => $request->input('nik'),
+                'passphrase' => $request->input('passphrase'),
+                'tampilan'   => "invisible",
+            ];
+
+            Log::channel('signature_no_qr')->info("Mengirim request sign dokumen dengan QR", [
+                'data'    => $payload,
+            ]);
+
+            // Panggil API eksternal
+            $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
+                ->attach(
+                    'file',                 // nama field file sesuai yang diminta API
+                    file_get_contents($file->getRealPath()),
+                    $file->getClientOriginalName()
+                )->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
+
+            if ($response->successful()) {
+                Log::channel('signature_no_qr')->info("Dokumen berhasil ditandatangani dengan QR", [
+                    'nik' => $payload['nik']
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Dokumen berhasil ditandatangani dengan QR',
+                    'data'    => $response->headers()
+                ]);
+            }
+
+            Log::channel('signature_no_qr')->error("Gagal menandatangani dokumen dengan QR", [
+                'status'  => $response->status(),
+                'error'   => $response->json()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menandatangani dokumen dengan QR',
+                'error'   => $response->json()
+            ], $response->status());
+        } catch (\Exception $e) {
+            Log::channel('signature_no_qr')->error("Exception saat validasi sign dokumen tanpa QR", [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan internal pada server.',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
