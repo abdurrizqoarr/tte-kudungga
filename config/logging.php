@@ -58,6 +58,30 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'signature_resume_ranap' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/signature_resume_ranap.log'),
+            'level' => 'debug',
+        ],
+
+        'signature_resume_ralan' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/signature_resume_ralan.log'),
+            'level' => 'debug',
+        ],
+
+        'signature_qr' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/signature_qr.log'),
+            'level' => 'debug',
+        ],
+
+        'signature_no_qr' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/signature_no_qr.log'),
+            'level' => 'debug',
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
@@ -89,7 +113,7 @@ return [
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
         ],
