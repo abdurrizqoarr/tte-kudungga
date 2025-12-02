@@ -13,6 +13,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SignTteController extends Controller
 {
@@ -153,6 +154,13 @@ class SignTteController extends Controller
         try {
             Log::channel('signature_resume_ralan')->info('Mulai generate PDF', ['view' => 'resume-ralan', 'no_rawat' => data_get($resume, 'no_rawat')]);
 
+            $linkqr = env('APP_URL') . '/verifikasi-dokumen';
+            $qrCodeBase64 = QrCode::format('png')
+                ->size(100)
+                ->errorCorrection('H')
+                ->generate($linkqr);
+                
+            $resume['qr_code_base64'] = $qrCodeBase64;
             $pdf = Pdf::loadView('resume-ralan', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
