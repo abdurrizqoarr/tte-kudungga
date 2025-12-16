@@ -283,7 +283,7 @@ class SignTteController extends Controller
                 ->generate($linkqr);
             $qrCodeBase64 = base64_encode($qrPng);
             $resume['qr_code_base64'] = $qrCodeBase64;
-            
+
             $pdf = Pdf::loadView('resume-ranap', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
@@ -400,6 +400,12 @@ class SignTteController extends Controller
                 'passphrase' => $request->input('passphrase'),
                 'tampilan'   => "invisible",
             ];
+
+            Log::info('Payload TTE:', [
+                'nik'      => $payload['nik'],
+                'tampilan' => $payload['tampilan'],
+                'passphrase' => $payload['passphrase'],
+            ]);
 
             Log::channel('signature_no_qr')->info("Mengirim request sign dokumen dengan QR", [
                 'data'    => $payload,
