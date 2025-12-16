@@ -161,8 +161,7 @@ class SignTteController extends Controller
                 ->generate($linkqr);
 
             $resume['qr_code_base64'] = $qrCodeBase64;
-            $options = PDF::getOptions(['isRemoteEnabled' => true]);
-            $pdf = PDF::loadView('resume-ralan', compact('resume'))->setPaper('A4')->setOptions($options);
+            $pdf = PDF::loadView('resume-ralan', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
             Log::channel('signature_resume_ralan')->info('PDF berhasil digenerate', [
