@@ -225,7 +225,7 @@
 
         <div class="ttd" style="text-align: center; margin-top: 60px;">
             <p>Sangatta, {{ $tanggalSekarang }}</p>
-            <img src="{{ public_path('logo/qrcode.png') }}" alt="qr"
+            <img src="data:image/png;base64,{{ $resume['qr_code_base64'] }}" alt="QR Code Dinamis"
                 style="width: 120px; height: 120px; object-fit: contain; margin-top: 3px; margin-bottom: 3px;">
             <p><strong>{{ $resume['dokter_dpjb'] }}</strong></p>
         </div>

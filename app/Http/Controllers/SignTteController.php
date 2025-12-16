@@ -276,6 +276,14 @@ class SignTteController extends Controller
         try {
             Log::channel('signature_resume_ranap')->info('Mulai generate PDF', ['view' => 'resume-ranap', 'no_rawat' => data_get($resume, 'no_rawat')]);
 
+            $linkqr = env('APP_URL') . '/verifikasi-dokumen';
+            $qrPng = QrCode::format('png')
+                ->size(100)
+                ->errorCorrection('H')
+                ->generate($linkqr);
+            $qrCodeBase64 = base64_encode($qrPng);
+            $resume['qr_code_base64'] = $qrCodeBase64;
+            
             $pdf = Pdf::loadView('resume-ranap', compact('resume'))->setPaper('A4');
             $pdfContent = $pdf->output();
 
