@@ -365,32 +365,32 @@ class SignTteController extends Controller
 
     public function signDokumenNoQr(Request $request)
     {
-        try {
-            // Validasi request dengan custom message
-            $validator = Validator::make($request->all(), [
-                'signed_file' => 'required|file|mimes:pdf|max:5120',
-                'passphrase'  => 'required|string',
-                'nik'         => 'required|string',
-            ], [
-                'signed_file.required' => 'File PDF wajib diunggah.',
-                'signed_file.mimes'    => 'File harus berformat PDF.',
-                'signed_file.max'      => 'Ukuran file maksimal 5MB.',
-                'passphrase.required'  => 'Passphrase wajib diisi.',
-                'nik.required'         => 'NIK wajib diisi.',
+        // Validasi request dengan custom message
+        $validator = Validator::make($request->all(), [
+            'signed_file' => 'required|file|mimes:pdf|max:5120',
+            'passphrase'  => 'required|string',
+            'nik'         => 'required|string',
+        ], [
+            'signed_file.required' => 'File PDF wajib diunggah.',
+            'signed_file.mimes'    => 'File harus berformat PDF.',
+            'signed_file.max'      => 'Ukuran file maksimal 5MB.',
+            'passphrase.required'  => 'Passphrase wajib diisi.',
+            'nik.required'         => 'NIK wajib diisi.',
+        ]);
+
+        if ($validator->fails()) {
+            Log::channel('signature_no_qr')->warning("Validasi gagal saat sign dokumen dengan QR", [
+                'errors' => $validator->errors()->toArray()
             ]);
 
-            if ($validator->fails()) {
-                Log::channel('signature_no_qr')->warning("Validasi gagal saat sign dokumen dengan QR", [
-                    'errors' => $validator->errors()->toArray()
-                ]);
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validasi gagal',
-                    'errors'  => $validator->errors()
-                ], 422);
-            }
-
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+        
+        try {
             // Baca file PDF
             $file = $request->file('signed_file');
 
