@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,7 @@
             max-width: 600px;
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             text-align: center;
         }
 
@@ -37,7 +38,22 @@
             color: #546071;
             font-size: 16px;
             line-height: 1.6;
-            margin-bottom: 25px;
+            margin-bottom: 18px;
+        }
+
+        .info-box {
+            background: #F1F5FB;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+            font-size: 15px;
+            color: #3B4A58;
+        }
+
+        .info-box strong {
+            display: inline-block;
+            width: 140px;
         }
 
         .btn {
@@ -55,7 +71,6 @@
             background-color: #6C9DE3;
         }
 
-        /* RESPONSIVE - Mobile */
         @media (max-width: 480px) {
             .container {
                 padding: 25px;
@@ -69,6 +84,14 @@
                 font-size: 14px;
             }
 
+            .info-box {
+                font-size: 14px;
+            }
+
+            .info-box strong {
+                width: 120px;
+            }
+
             .btn {
                 width: 100%;
                 padding: 14px;
@@ -77,14 +100,29 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Validasi Dokumen Tanda Tangan Elektronik</h1>
+
         <p>
-            Dokumen Anda telah berhasil ditandatangani menggunakan<br>
-            <strong>Tanda Tangan Elektronik Standar BSrE (BSSN).</strong><br><br>
+            Dokumen ini telah berhasil ditandatangani menggunakan<br>
+            <strong>Tanda Tangan Elektronik Standar BSrE (BSSN).</strong>
+        </p>
+
+        <div class="info-box">
+            <p>
+                <strong>Nama Dokter</strong>: {{ $data->dokter_dpjb }}
+            </p>
+            <p>
+                <strong>Tanggal TTE</strong>:
+                {{ \Carbon\Carbon::parse($data->created_at)->translatedFormat('d F Y H:i') }} WIB
+            </p>
+        </div>
+
+        <p>
             Untuk memastikan keabsahan dan integritas dokumen, silakan lakukan proses
-            <em>validasi dokumen</em> melalui portal resmi di bawah ini.
+            <em>validasi dokumen</em> melalui portal resmi berikut.
         </p>
 
         <a href="https://tte.kutaitimurkab.go.id/" target="_blank" class="btn">
@@ -96,4 +134,5 @@
         </p>
     </div>
 </body>
+
 </html>

@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sign_dokumen', function (Blueprint $table) {
-            $table->uuid("id")->primary();
-            $table->string("nik");
-            $table->string("dokumen_asli");
-            $table->string("id_dokumen_ttd");
-            $table->string("image_ttd");
+        Schema::create('riwayat_resume_ralans', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('nama_penanda_tangan');
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sign_dokumen');
+        Schema::dropIfExists('riwayat_resume_ralans');
     }
 };

@@ -3,4 +3,5 @@
 use App\Http\Controllers\InformController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/verifikasi-dokumen', [InformController::class, 'informPage']);
+Route::get('/verifikasi-dokumen-ralan/{idDokumen}', [InformController::class, 'informPageRalan']);
+Route::get('/verifikasi-dokumen-ramap/{idDokumen}', [InformController::class, 'informPageRanap']);
