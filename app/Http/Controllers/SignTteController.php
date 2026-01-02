@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ResumeRalanLog;
 use App\Models\ResumeRanapLog;
 use App\Models\RiwayatResumeRalan;
-use App\Models\RiwayatResumeRamap;
+use App\Models\RiwayatResumeRanap;
 use App\Models\SignDokumen;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -357,7 +357,7 @@ class SignTteController extends Controller
                 'user_id' => $request->ip(),
             ]);
 
-            $riwayatDokumen = RiwayatResumeRamap::create([
+            $riwayatDokumen = RiwayatResumeRanap::create([
                 "nama_penanda_tangan" => $request->input('resume.dokter_dpjb')
             ]);
 
