@@ -199,7 +199,7 @@ class SignTteController extends Controller
             $resume['qr_code_base64'] = $qrCodeBase64;
 
             //Load View PDF
-            $pdf = PDF::loadView('resume-ranap', compact('resume'))->setPaper('A4');
+            $pdf = PDF::loadView('resume-ralan', compact('resume'))->setPaper('A4');
 
             //Hasil Akhir PDF
             $pdfContent = $pdf->output();
@@ -376,7 +376,7 @@ class SignTteController extends Controller
             $resume['qr_code_base64'] = $qrCodeBase64;
 
             //Load View PDF
-            $pdf = PDF::loadView('resume-ralan', compact('resume'))->setPaper('A4');
+            $pdf = PDF::loadView('resume-ranap', compact('resume'))->setPaper('A4');
 
             //Hasil Akhir PDF
             $pdfContent = $pdf->output();
