@@ -184,7 +184,7 @@ class SignTteController extends Controller
                 "nama_penanda_tangan" => $request->input('resume.dokter_dpjb')
             ]);
 
-            $linkqr = env('APP_URL') . '/verifikasi-dokumen/' . $riwayatDokumen->id;
+            $linkqr = env('APP_URL') . '/verifikasi-dokumen-ralan/' . $riwayatDokumen->id;
 
             //Generate QR
             $qrPng = QrCode::format('png')
@@ -361,7 +361,7 @@ class SignTteController extends Controller
                 "nama_penanda_tangan" => $request->input('resume.dokter_dpjb')
             ]);
 
-            $linkqr = env('APP_URL') . '/verifikasi-dokumen/' . $riwayatDokumen->id;
+            $linkqr = env('APP_URL') . '//verifikasi-dokumen-ranap/' . $riwayatDokumen->id;
 
             //Generate QR
             $qrPng = QrCode::format('png')
