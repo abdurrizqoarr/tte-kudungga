@@ -112,7 +112,7 @@
 
         <div class="info-box">
             <p>
-                <strong>Nama Dokter</strong>: {{ $data->dokter_dpjb }}
+                <strong>Nama Dokter</strong>: {{ $data->nama_penanda_tangan }}
             </p>
             <p>
                 <strong>Tanggal TTE</strong>:
