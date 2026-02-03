@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NoQrLog;
 use App\Models\ResumeRalanLog;
 use App\Models\ResumeRanapLog;
 use App\Models\RiwayatResumeRalan;
@@ -499,8 +500,10 @@ class SignTteController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::channel('signature_no_qr')->warning("Validasi gagal saat sign dokumen dengan QR", [
-                'errors' => $validator->errors()->toArray()
+            NoQrLog::create([
+                'action' => 'VALIDATION_FAILED',
+                'description' => 'Credential signing tidak lengkap atau file tidak sesuai. Errors: ' . json_encode($validator->errors()->toArray()),
+                'user_id' => $request->ip(),
             ]);
 
             return response()->json([
@@ -509,6 +512,14 @@ class SignTteController extends Controller
                 'errors'  => $validator->errors()
             ], 422);
         }
+
+        $maskNik = $this->maskSensitive($validator['nik']);
+
+        NoQrLog::create([
+            'action' => "START_SIGN",
+            'description' => $maskNik . " Memulai Sign Dokumen Resume Ralan Pasien" . $request->input('resume.no_rawat'),
+            'user_id' => $request->ip(),
+        ]);
 
         try {
             // Baca file PDF
@@ -521,14 +532,10 @@ class SignTteController extends Controller
                 'tampilan'   => "invisible",
             ];
 
-            Log::info('Payload TTE:', [
-                'nik'      => $payload['nik'],
-                'tampilan' => $payload['tampilan'],
-                'passphrase' => $payload['passphrase'],
-            ]);
-
-            Log::channel('signature_no_qr')->info("Mengirim request sign dokumen dengan QR", [
-                'data'    => $payload,
+            NoQrLog::create([
+                'action' => 'SENDING_REQUEST',
+                'description' => 'Mengirim request sign dokumen dengan QR',
+                'user_id' => $request->ip(),
             ]);
 
             // Panggil API eksternal
@@ -540,8 +547,10 @@ class SignTteController extends Controller
                 )->post(env('BASE_URL_BSRE') . '/sign/pdf', $payload);
 
             if ($response->successful()) {
-                Log::channel('signature_no_qr')->info("Dokumen berhasil ditandatangani dengan QR", [
-                    'nik' => $payload['nik']
+                NoQrLog::create([
+                    'action' => 'SIGN_SUCCESS',
+                    'description' => $maskNik . " Berhasil menandatangani dokumen dengan QR",
+                    'user_id' => $request->ip(),
                 ]);
 
                 return response()->json([
@@ -551,9 +560,10 @@ class SignTteController extends Controller
                 ]);
             }
 
-            Log::channel('signature_no_qr')->error("Gagal menandatangani dokumen dengan QR", [
-                'status'  => $response->status(),
-                'error'   => $response->json()
+            NoQrLog::create([
+                'action' => 'SIGN_FAILED',
+                'description' => $maskNik . " Gagal menandatangani dokumen dengan QR. Status: " . $response->status(),
+                'user_id' => $request->ip(),
             ]);
 
             return response()->json([
@@ -562,9 +572,10 @@ class SignTteController extends Controller
                 'error'   => $response->json()
             ], $response->status());
         } catch (\Exception $e) {
-            Log::channel('signature_no_qr')->error("Exception saat validasi sign dokumen tanpa QR", [
-                'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString()
+            NoQrLog::create([
+                'action' => 'SIGN_EXCEPTION',
+                'description' => $maskNik . " Exception saat sign dokumen dengan QR: " . $e->getMessage(),
+                'user_id' => $request->ip(),
             ]);
 
             return response()->json([
