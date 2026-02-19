@@ -540,6 +540,7 @@ class SignTteController extends Controller
 
             // Panggil API eksternal
             $response = Http::withBasicAuth(env('USERNAME_BSRE'), env('PASSWORD_BSRE'))
+                ->timeout(180)
                 ->attach(
                     'file',                 // nama field file sesuai yang diminta API
                     file_get_contents($file->getRealPath()),
