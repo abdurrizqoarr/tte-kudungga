@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ResumeRanapLog extends Model
 {
-    protected $table = 'resume_ralan_logs';
+    protected $table = 'resume_ranap_logs';
     protected $primaryKey = 'id';
     public $incrementing = true;
 

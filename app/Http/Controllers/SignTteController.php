@@ -318,7 +318,7 @@ class SignTteController extends Controller
 
         ResumeRanapLog::create([
             'action' => "START_SIGN",
-            'description' => $maskNik . " Memulai Sign Dokumen Resume Ralan Pasien" . $request->input('resume.no_rawat'),
+            'description' => $maskNik . " Memulai Sign Dokumen Resume Ranap Pasien" . $request->input('resume.no_rawat'),
             'user_id' => $request->ip(),
         ]);
 
@@ -362,7 +362,7 @@ class SignTteController extends Controller
                 "nama_penanda_tangan" => $request->input('resume.dokter_dpjb')
             ]);
 
-            $linkqr = env('APP_URL') . '//verifikasi-dokumen-ranap/' . $riwayatDokumen->id;
+            $linkqr = env('APP_URL') . '/verifikasi-dokumen-ranap/' . $riwayatDokumen->id;
 
             //Generate QR
             $qrPng = QrCode::format('png')
