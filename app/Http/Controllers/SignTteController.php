@@ -189,7 +189,7 @@ class SignTteController extends Controller
 
             //Generate QR
             $qrPng = QrCode::format('png')
-                ->size(60)
+                ->size(100)
                 ->errorCorrection('H')
                 ->generate($linkqr);
 
@@ -366,7 +366,7 @@ class SignTteController extends Controller
 
             //Generate QR
             $qrPng = QrCode::format('png')
-                ->size(60)
+                ->size(100)
                 ->errorCorrection('H')
                 ->generate($linkqr);
 
