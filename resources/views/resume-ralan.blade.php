@@ -6,13 +6,13 @@
     <title>Resume Medis Rawat Inap</title>
     <style>
         @page {
-            /* Margin bottom diperbesar untuk ruang footer BSrE di setiap halaman */
-            margin: 60px 30px 180px 30px;
+            /* Margin bottom disesuaikan untuk memberi ruang footer yang lebih tinggi */
+            margin: 60px 30px 220px 30px;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #333;
             margin-top: 120px;
         }
@@ -26,139 +26,118 @@
             height: 100px;
         }
 
-        /* Styling Footer BSrE */
         footer {
             position: fixed;
-            bottom: -160px; /* Disesuaikan dengan margin bottom @page */
+            bottom: -200px;
+            /* Posisi footer ditarik ke bawah */
             left: 0;
             right: 0;
-            height: 160px;
+            height: 200px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         th,
         td {
             border: 1px solid #aaa;
-            padding: 6px 8px;
+            padding: 5px 8px;
             vertical-align: top;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
         .section-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #00695c;
-            margin: 18px 0 8px;
+            margin: 15px 0 5px;
         }
 
-        /* Override tabel di header dan footer agar tidak ada border & background */
-        .layout-table, .layout-table td, .layout-table tr:nth-child(even) {
-            border: none;
+        .layout-table,
+        .layout-table td,
+        .layout-table tr {
+            border: none !important;
             background-color: transparent !important;
-            padding: 0;
+            padding: 0 !important;
         }
 
-        .bsre-meta, .bsre-meta td, .bsre-meta tr:nth-child(even) {
-            border: none;
-            background-color: transparent !important;
-            padding: 2px 5px;
-        }
-
+        /* Box TTE BSrE */
         .bsre-box {
-            border: 1px solid #000;
+            border: 1px solid #333;
             width: 100%;
-            margin-bottom: 0;
         }
 
-        .bsre-box-inner, .bsre-box-inner td, .bsre-box-inner tr:nth-child(even) {
-            border: none;
-            background-color: transparent !important;
+        .bsre-box td {
+            border: none !important;
+            padding: 8px !important;
         }
 
         .footer-text {
             text-align: center;
-            font-size: 10px;
+            font-size: 9px;
             margin-top: 15px;
+            /* Memberi jarak dari logo BSrE di atasnya */
+            color: #666;
             line-height: 1.3;
+        }
+
+        .bsre-logo-bottom {
+            display: block;
+            margin: 10px auto 0;
+            width: 50px;
+            /* Ukuran logo BSrE */
         }
     </style>
 </head>
 
 <body>
-    <!-- Deklarasi tanggal dipindah ke atas agar bisa dibaca oleh Footer -->
     @php
         use Carbon\Carbon;
         Carbon::setLocale('id');
         $tanggalSekarang = Carbon::now()->translatedFormat('d F Y');
     @endphp
 
-    <!-- Header -->
     <header>
-        <table width="100%" class="layout-table" style="margin-bottom: 10px;">
+        <table class="layout-table">
             <tr>
                 <td width="20%" style="text-align: center; vertical-align: middle;">
-                    <img src="{{ public_path('logo/logo_kudungga.png') }}" alt="Logo Kudungga"
-                        style="width: 80px; height: 80px; object-fit: contain;">
+                    <img src="{{ public_path('logo/logo_kudungga.png') }}" style="width: 70px;">
                 </td>
-
-                <td width="60%" style="text-align: center; font-size: 12px;">
-                    <h3 style="margin: 0; font-size: 16px;">RSUD Kudungga Sangatta</h3>
+                <td width="60%" style="text-align: center;">
+                    <h3 style="margin: 0; font-size: 15px;">RSUD Kudungga Sangatta</h3>
                     <p style="margin: 2px 0;">Jl. Soekarno-Hatta, Sangatta Utara, 75681, Kalimantan Timur</p>
-                    <p style="margin: 2px 0;">Telp. 0549-2035589</p>
-                    <p style="margin: 2px 0;">Email: info@rsudkudungga.com</p>
+                    <p style="margin: 2px 0;">Telp. 0549-2035589 | Email: info@rsudkudungga.com</p>
                 </td>
-
                 <td width="20%" style="text-align: center; vertical-align: middle;">
-                    <img src="{{ public_path('logo/Logo_Kutai_Timur.png') }}" alt="Logo Kutai Timur"
-                        style="width: 80px; height: 60px; object-fit: contain;">
+                    <img src="{{ public_path('logo/Logo_Kutai_Timur.png') }}" style="width: 70px;">
                 </td>
             </tr>
         </table>
         <hr>
     </header>
 
-    <!-- Footer BSrE -->
     <footer>
         <table class="layout-table">
             <tr>
                 <td width="55%"></td>
                 <td width="45%">
-                    <table class="bsre-meta" style="margin-bottom: 8px;">
-                        <tr>
-                            <td width="35%">Dikeluarkan di</td>
-                            <td width="5%">:</td>
-                            <td width="60%">Sangatta</td>
-                        </tr>
-                        <tr>
-                            <td>Pada tanggal</td>
-                            <td>:</td>
-                            <td>{{ $tanggalSekarang }}</td>
-                        </tr>
-                    </table>
-
+                    <div style="text-align: left; font-size: 10px; margin-bottom: 4px; padding-left: 5px;">
+                        Sangatta, {{ $tanggalSekarang }}
+                    </div>
                     <table class="bsre-box">
                         <tr>
-                            <td style="padding: 0; border: none;">
-                                <table class="bsre-box-inner" style="margin-bottom: 0; width: 100%;">
-                                    <tr>
-                                        <td width="25%" style="text-align: center; vertical-align: middle; padding: 10px;">
-                                            <img src="{{ public_path('logo/logo_bsre.png') }}" alt="Logo BSrE" style="width: 55px; height: auto;">
-                                        </td>
-                                        <td width="75%" style="font-size: 9px; line-height: 1.4; padding: 10px 10px 10px 0; vertical-align: middle;">
-                                            Ditandatangani secara elektronik oleh:<br>
-                                            <b>DOKTER DPJP</b><br><br><br>
-                                            <b>{{ $resume['dokter_dpjb'] }}</b>
-                                        </td>
-                                    </tr>
-                                </table>
+                            <td width="30%"
+                                style="text-align: center; vertical-align: middle; border-right: 1px solid #ccc !important;">
+                                <img src="data:image/png;base64,{{ $resume['qr_code_base64'] }}"
+                                    style="width: 75px; height: 75px;">
+                            </td>
+                            <td width="70%"
+                                style="font-size: 9px; vertical-align: middle; padding-left: 10px !important;">
+                                Ditandatangani secara elektronik oleh:<br>
+                                <strong style="font-size: 10px;">DOKTER DPJP</strong><br><br><br>
+                                <strong style="font-size: 10px;">{{ $resume['dokter_dpjb'] }}</strong>
                             </td>
                         </tr>
                     </table>
@@ -166,13 +145,14 @@
             </tr>
         </table>
 
+        <img src="{{ public_path('logo/logo-bsre.png') }}" class="bsre-logo-bottom" alt="Logo BSrE">
+
         <div class="footer-text">
             Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik<br>
             yang telah diterbitkan oleh Balai Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
         </div>
     </footer>
 
-    <!-- Konten -->
     <main>
         <div class="section-title">Informasi Pasien</div>
         <table>
@@ -226,16 +206,14 @@
         <table>
             <tr>
                 <td width="30%">Diagnosa Utama</td>
-                <td style="white-space: pre-line;">{{ $resume['diagnosa_utama'] }}
-                    ({{ $resume['kd_diagnosa_utama'] ?: '-' }})</td>
+                <td>{{ $resume['diagnosa_utama'] }} ({{ $resume['kd_diagnosa_utama'] ?: '-' }})</td>
             </tr>
             <tr>
                 <td>Diagnosa Sekunder</td>
                 <td style="white-space: pre-line;">
                     {{ $resume['diagnosa_sekunder'] ?: '-' }}<br>
                     {{ $resume['diagnosa_sekunder2'] ?: '-' }}<br>
-                    {{ $resume['diagnosa_sekunder3'] ?: '-' }}<br>
-                    {{ $resume['diagnosa_sekunder4'] ?: '-' }}
+                    {{ $resume['diagnosa_sekunder3'] ?: '-' }}
                 </td>
             </tr>
         </table>
@@ -244,30 +222,25 @@
         <table>
             <tr>
                 <td width="30%">Prosedur Utama</td>
-                <td style="white-space: pre-line;">{{ $resume['prosedur_utama'] ?: '-' }}</td>
+                <td>{{ $resume['prosedur_utama'] ?: '-' }}</td>
             </tr>
             <tr>
                 <td>Prosedur Sekunder</td>
                 <td style="white-space: pre-line;">
                     {{ $resume['prosedur_sekunder'] ?: '-' }}<br>
-                    {{ $resume['prosedur_sekunder2'] ?: '-' }}<br>
-                    {{ $resume['prosedur_sekunder3'] ?: '-' }}
+                    {{ $resume['prosedur_sekunder2'] ?: '-' }}
                 </td>
             </tr>
         </table>
 
-        <div class="section-title">Kondisi Pulang</div>
+        <div class="section-title">Kondisi & Obat Pulang</div>
         <table>
             <tr>
                 <td width="30%">Kondisi Pulang</td>
-                <td style="white-space: pre-line;">{{ $resume['kondisi_pulang'] ?: '-' }}</td>
+                <td>{{ $resume['kondisi_pulang'] ?: '-' }}</td>
             </tr>
-        </table>
-
-        <div class="section-title">Obat Pulang</div>
-        <table>
             <tr>
-                <td width="30%">Obat Pulang</td>
+                <td>Obat Pulang</td>
                 <td style="white-space: pre-line;">{{ $resume['obat_pulang'] ?: '-' }}</td>
             </tr>
         </table>

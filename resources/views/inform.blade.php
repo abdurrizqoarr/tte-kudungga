@@ -116,7 +116,7 @@
             </p>
             <p>
                 <strong>Tanggal TTE</strong>:
-                {{ \Carbon\Carbon::parse($data->created_at)->translatedFormat('d F Y H:i') }} WIB
+                {{ \Carbon\Carbon::parse($data->created_at)->translatedFormat('d F Y') }}
             </p>
         </div>
 
