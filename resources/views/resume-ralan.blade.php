@@ -370,7 +370,7 @@
                                     ">
 
                                     <img src="data:image/png;base64,{{ $resume['qr_code_base64'] }}"
-                                        style="width: 75px; height: 75px;">
+                                        style="width: 120px; height: 120px;">
 
                                 </td>
 
