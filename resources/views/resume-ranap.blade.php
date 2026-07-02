@@ -448,7 +448,7 @@
 
             <div class="footer-text">
                 Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik<br>
-                yang telah diterbitkan oleh Balai Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
+                yang telah diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
             </div>
 
         </div>
